@@ -87,7 +87,8 @@
           {nombre:"Tuxedo Sam", cara:drawTuxedoSam, charla:"¡Hola! ¿Tienes pastel de fresa?"},
           {nombre:"Badtz-Maru", cara:drawBadtzMaru, charla:"¡Hazlo genial, por favor!"},
           {nombre:"Pekkle", cara:drawPekkle, charla:"¡Quiero un pastel para bailar!"},
-          {nombre:"Pompompurin", cara:drawPompompurin, charla:"¡Me encanta el pastel con crema!"}
+          {nombre:"Pompompurin", cara:drawPompompurin, charla:"¡Me encanta el pastel con crema!"},
+          {nombre:"Zan", cara:drawZan, charla:"¡Órale! ¿Me haces una pastela bien chida?"}
         ]
       },
       {
@@ -642,6 +643,34 @@
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.arc(0, 5, 5, 0, Math.PI, false);
+      ctx.stroke();
+      ctx.restore();
+    }
+    function drawZan(ctx, x, y) {
+      ctx.save();
+      ctx.translate(x, y);
+      // White circle for face
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(0, 0, 25, 0, Math.PI*2);
+      ctx.fill();
+      // Black baseball hat
+      ctx.fillStyle = "#222";
+      ctx.beginPath();
+      ctx.ellipse(0, -25, 28, 8, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.fillRect(-20, -35, 40, 15);
+      // Eyes
+      ctx.fillStyle = "#222";
+      ctx.beginPath();
+      ctx.arc(-8, -5, 2, 0, Math.PI*2);
+      ctx.arc(8, -5, 2, 0, Math.PI*2);
+      ctx.fill();
+      // Smiley mouth
+      ctx.strokeStyle = "#222";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(0, 2, 10, 0.2*Math.PI, 0.8*Math.PI, false);
       ctx.stroke();
       ctx.restore();
     }
