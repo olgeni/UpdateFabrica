@@ -133,7 +133,9 @@
     let musicaIniciada = false;
     function iniciarSonidos() {
       if(!musicaIniciada){
-        musica.play();
+        musica.play().catch(e => {
+          // Silently ignore audio errors
+        });
         musicaIniciada=true;
       }
     }
@@ -176,6 +178,11 @@
     let puntaje = 0, totalPedidos = 0;
     let animX = -110, animIn = false;
     let horneando = false, hornoAnim = 0;
+    // Variables de animación para las animaciones de espera de los personajes
+    // Estas animaciones transmiten el ánimo alegre y juguetón del juego
+    let idleAnimationType = 0; // 0 = cabeceo musical, 1 = rebote
+    let idleAnimationFrame = 0;
+    let idleAnimationActive = false;
 
     // --- Elementos DOM ---
     const pastelCanvas = document.getElementById('pastel');
@@ -692,7 +699,9 @@
         if(i < texto.length) {
           notaPedidoDiv.innerHTML += texto[i];
           sonidoEscribir.currentTime = 0;
-          sonidoEscribir.play();
+          sonidoEscribir.play().catch(e => {
+            // Silently ignore audio errors
+          });
           i++;
           setTimeout(escribir, 30 + Math.random()*40);
         }
@@ -710,7 +719,9 @@
           charlaDiv.innerHTML += texto[i];
           if(texto[i] !== " " && texto[i] !== "\n") {
             sonidoUndertale.currentTime = 0;
-            sonidoUndertale.play();
+            sonidoUndertale.play().catch(e => {
+              // Silently ignore audio errors
+            });
           }
           i++;
           setTimeout(escribir, 22 + Math.random()*18);
@@ -740,6 +751,7 @@
       );
       animX = -110;
       animIn = true;
+      idleAnimationActive = false; // Reiniciar animación de espera
       drawPersonajeAnim();
       mensajeDiv.innerHTML = "";
       calificacionDiv.innerHTML = "";
@@ -780,7 +792,12 @@
       });
     }
 
-    // --- Animación de entrada del cliente ---
+    // --- Animación de entrada del cliente con animaciones de espera ---
+    // Sistema de animaciones:
+    // 1. Animación de entrada: El personaje se desliza desde la izquierda
+    // 2. Animaciones de espera (aleatorias):
+    //    - Cabeceo musical: El personaje mueve la cabeza al ritmo de la música
+    //    - Rebote: El personaje salta y se aplasta ligeramente al tocar el suelo
     function drawPersonajeAnim() {
       ctxPersonaje.clearRect(0,0,110,90);
       if(animIn) {
@@ -788,8 +805,47 @@
         if(animX >= 55) {
           animX = 55;
           animIn = false;
+          // Iniciar animación de espera después de la entrada
+          idleAnimationActive = true;
+          idleAnimationType = Math.random() < 0.5 ? 0 : 1; // Aleatorio: 0 = cabeceo musical, 1 = rebote
+          idleAnimationFrame = 0;
         }
         pedido.personaje.cara(ctxPersonaje, animX, 45);
+        requestAnimationFrame(drawPersonajeAnim);
+      } else if(idleAnimationActive && !horneando) {
+        // Aplicar transformaciones de animación de espera
+        ctxPersonaje.save();
+        
+        if(idleAnimationType === 0) {
+          // Animación de cabeceo musical
+          const tiltAngle = Math.sin(idleAnimationFrame * 0.1) * 0.25;
+          ctxPersonaje.translate(55, 45);
+          ctxPersonaje.rotate(tiltAngle);
+          ctxPersonaje.translate(-55, -45);
+          pedido.personaje.cara(ctxPersonaje, 55, 45);
+        } else {
+          // Animación de rebote
+          const bouncePhase = Math.sin(idleAnimationFrame * 0.08);
+          const bounceY = Math.abs(bouncePhase) * 8;
+          // Animación suave de aplastamiento basada en proximidad al suelo
+          const squashAmount = Math.max(0, 1 - (bounceY / 4)); // 0 cuando está alto, 1 cuando toca el suelo
+          const squashScale = 1 - (squashAmount * 0.15); // Máximo 15% de aplastamiento
+          const stretchScale = 1 + (squashAmount * 0.1); // Ligero estiramiento horizontal al aplastarse
+          
+          // Mantener la parte inferior alineada ajustando la posición Y al aplastar
+          const squashOffset = (1 - squashScale) * 45; // Compensar la reducción de altura
+          
+          ctxPersonaje.translate(55, 45 - bounceY + squashOffset);
+          ctxPersonaje.scale(stretchScale, squashScale);
+          ctxPersonaje.translate(-55, -(45 - bounceY + squashOffset));
+          
+          // Dibujar en la posición de rebote
+          pedido.personaje.cara(ctxPersonaje, 55, 45 - bounceY + squashOffset);
+        }
+        
+        ctxPersonaje.restore();
+        
+        idleAnimationFrame++;
         requestAnimationFrame(drawPersonajeAnim);
       } else {
         pedido.personaje.cara(ctxPersonaje, 55, 45);
@@ -841,7 +897,9 @@
       totalPedidos++;
       puntajeDiv.innerHTML = `Pedidos: ${totalPedidos} &nbsp; | &nbsp; Puntos: ${puntaje}`;
       sonidoEntregar.currentTime = 0;
-      sonidoEntregar.play();
+      sonidoEntregar.play().catch(e => {
+        // Silently ignore audio errors
+      });
       // Cambia de temática si corresponde
       if (puntaje % 50 === 0) {
         setTimeout(() => {
