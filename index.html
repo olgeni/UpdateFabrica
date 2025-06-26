@@ -198,6 +198,26 @@
     let idleAnimationFrame = 0;
     let idleAnimationActive = false;
 
+    // --- Sistema de guardado con localStorage ---
+    function guardarProgreso() {
+      const datosJuego = {
+        puntaje: puntaje,
+        totalPedidos: totalPedidos
+      };
+      localStorage.setItem('fabricaPasteles_progreso', JSON.stringify(datosJuego));
+    }
+
+    function cargarProgreso() {
+      const datosGuardados = localStorage.getItem('fabricaPasteles_progreso');
+      if (datosGuardados) {
+        const datos = JSON.parse(datosGuardados);
+        puntaje = datos.puntaje || 0;
+        totalPedidos = datos.totalPedidos || 0;
+        // Actualizar la visualización del puntaje
+        document.getElementById('puntaje').innerHTML = `Pedidos: ${totalPedidos} &nbsp; | &nbsp; Puntos: ${puntaje}`;
+      }
+    }
+
     // --- Elementos DOM ---
     const pastelCanvas = document.getElementById('pastel');
     const basesDiv = document.getElementById('bases');
@@ -912,6 +932,8 @@
       puntaje += aciertos;
       totalPedidos++;
       puntajeDiv.innerHTML = `Pedidos: ${totalPedidos} &nbsp; | &nbsp; Puntos: ${puntaje}`;
+      // Guardar progreso después de cada entrega
+      guardarProgreso();
       // Deshabilitado temporalmente hasta tener archivos de sonido locales
       // sonidoEntregar.currentTime = 0;
       // sonidoEntregar.play().catch(e => {
@@ -954,8 +976,13 @@
     drawCocina();
     drawPastel();
     renderOpciones();
+    // Cargar progreso guardado antes de iniciar
+    cargarProgreso();
     nuevoPedido();
-    puntajeDiv.innerHTML = `Pedidos: 0 &nbsp; | &nbsp; Puntos: 0`;
+    // Si no hay progreso guardado, mostrar puntaje inicial
+    if (puntaje === 0 && totalPedidos === 0) {
+      puntajeDiv.innerHTML = `Pedidos: 0 &nbsp; | &nbsp; Puntos: 0`;
+    }
     drawHorno();
   </script>
 </body>
