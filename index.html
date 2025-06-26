@@ -51,10 +51,10 @@
 </head>
 <body>
   <!-- Música y sonidos personalizados -->
-  <audio id="musica" src="https://zeta.123tokyo.xyz/get.php/6/1f/sV0Aqmt1Uck.mp3?n=ROYALTY%20FREE%20Restaurant%20Music%20_%20Jazz%20Music%20Royalty%20Free%20_%20BGM%20Royalty%20Free%20Music&uT=R&uN=ZHVieWE%3D&h=ZI0wR4HrRgEHlFvEoRYL1A&s=1749784295&uT=R&uN=ZHVieWE%3D" loop preload="auto"></audio>
-  <audio id="sonido-escribir" src="https://api.ytconverterpro.com/tunnel?id=VfaPvSoyoTnOwGWF0w-tD&exp=1749777522372&sig=CzFPRtfmlUr8n36jXZLbmzDNGX69iyerB9FqG_43iOA&sec=3m4AkKA8dX5CKPHtiJN7lPL6APM3VRjYCttPNd5k9OY&iv=8bnw9pqrvY4kJ2OMUEaLfQ" preload="auto"></audio>
-  <audio id="sonido-entregar" src="https://api.ytconverterpro.com/tunnel?id=98K_ZKFuLCZ8ZuY-mYFYp&exp=1749777459169&sig=s2dNJlQgm_ZvJhAVnOU6ioWqwZHEy_v5cE4q-FaQyGQ&sec=cZGb3xAH2po-AU-6_qGfRHhT_oIIA11yDw8IZwUS0jk&iv=X1DE3r8FEVTPVGR4aw1AvA" preload="auto"></audio>
-  <audio id="sonido-undertale" src="https://theta.123tokyo.xyz/get.php/7/a4/-XAY6fHBTpI.mp3?n=Generic%202%20Dialogue%20Sound%20Effect%20%28Undertale%20Character%20Voice%20Beeps%29&uT=R&uN=ZHVieWE%3D&h=INnQpj5eJSw1nLaVyXdnrA&s=1749784448&uT=R&uN=ZHVieWE%3D" preload="auto"></audio>
+  <audio id="musica" src="sound/fabrica-de-pasteles-01.ogg" preload="auto"></audio>
+  <audio id="sonido-escribir" preload="auto"></audio>
+  <audio id="sonido-entregar" preload="auto"></audio>
+  <audio id="sonido-undertale" preload="auto"></audio>
   <div id="juego">
     <canvas id="cocina" width="360" height="180"></canvas>
     <div id="charla"></div>
@@ -123,10 +123,19 @@
 
     // --- Sonidos y música ---
     const musica = document.getElementById('musica');
+    
+    // Lista de pistas de música personalizada para el juego
+    const playlistMusica = [
+      'sound/fabrica-de-pasteles-01.ogg',
+      'sound/fabrica-de-pasteles-02.ogg',
+      'sound/fabrica-de-pasteles-03.ogg',
+      'sound/fabrica-de-pasteles-04.ogg'
+    ];
+    let indicePistaActual = 0;
     const sonidoEscribir = document.getElementById('sonido-escribir');
     const sonidoEntregar = document.getElementById('sonido-entregar');
     const sonidoUndertale = document.getElementById('sonido-undertale');
-    musica.volume = 1.0;
+    musica.volume = 0.4;  // Volumen más bajo para la música de fondo
     sonidoEscribir.volume = 1.0;
     sonidoEntregar.volume = 1.0;
     sonidoUndertale.volume = 1.0;
@@ -134,14 +143,19 @@
     function iniciarSonidos() {
       if(!musicaIniciada){
         musica.play().catch(e => {
-          // Silently ignore audio errors
+          // Ignorar errores de audio silenciosamente
+          console.log('No se pudo reproducir la música:', e);
         });
         musicaIniciada=true;
       }
     }
+    // Sistema de playlist: cuando termina una canción, reproduce la siguiente
     musica.addEventListener('ended', function() {
-      this.currentTime = 0;
-      this.play();
+      indicePistaActual = (indicePistaActual + 1) % playlistMusica.length;
+      musica.src = playlistMusica[indicePistaActual];
+      musica.play().catch(e => {
+        // Ignorar errores de audio silenciosamente
+      });
     });
     document.body.addEventListener('pointerdown', iniciarSonidos, {once:true});
     document.body.addEventListener('keydown', iniciarSonidos, {once:true});
@@ -698,10 +712,11 @@
       function escribir() {
         if(i < texto.length) {
           notaPedidoDiv.innerHTML += texto[i];
-          sonidoEscribir.currentTime = 0;
-          sonidoEscribir.play().catch(e => {
-            // Silently ignore audio errors
-          });
+          // Deshabilitado temporalmente hasta tener archivos de sonido locales
+          // sonidoEscribir.currentTime = 0;
+          // sonidoEscribir.play().catch(e => {
+          //   // Silently ignore audio errors
+          // });
           i++;
           setTimeout(escribir, 30 + Math.random()*40);
         }
@@ -718,10 +733,11 @@
         if(i < texto.length) {
           charlaDiv.innerHTML += texto[i];
           if(texto[i] !== " " && texto[i] !== "\n") {
-            sonidoUndertale.currentTime = 0;
-            sonidoUndertale.play().catch(e => {
-              // Silently ignore audio errors
-            });
+            // Deshabilitado temporalmente hasta tener archivos de sonido locales
+            // sonidoUndertale.currentTime = 0;
+            // sonidoUndertale.play().catch(e => {
+            //   // Silently ignore audio errors
+            // });
           }
           i++;
           setTimeout(escribir, 22 + Math.random()*18);
@@ -896,10 +912,11 @@
       puntaje += aciertos;
       totalPedidos++;
       puntajeDiv.innerHTML = `Pedidos: ${totalPedidos} &nbsp; | &nbsp; Puntos: ${puntaje}`;
-      sonidoEntregar.currentTime = 0;
-      sonidoEntregar.play().catch(e => {
-        // Silently ignore audio errors
-      });
+      // Deshabilitado temporalmente hasta tener archivos de sonido locales
+      // sonidoEntregar.currentTime = 0;
+      // sonidoEntregar.play().catch(e => {
+      //   // Silently ignore audio errors
+      // });
       // Cambia de temática si corresponde
       if (puntaje % 50 === 0) {
         setTimeout(() => {
