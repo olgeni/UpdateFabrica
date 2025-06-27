@@ -40,12 +40,33 @@
     #calificacion { font-size: 1.2em; margin: 0.2em; min-height:2em; color:#fffbe7; }
     #mensaje { font-size: 1em; margin: 0.2em; min-height:2em; color:#fffbe7; }
     #puntaje { font-size: 1em; margin: 0.2em; color:#fffbe7; }
+    #botonMute { 
+      position: fixed; 
+      bottom: 20px; 
+      right: 20px; 
+      font-size: 1.5em; 
+      padding: 0.3em 0.5em; 
+      border-radius: 50%; 
+      width: 50px; 
+      height: 50px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      z-index: 100;
+    }
     @media (max-width: 600px) {
       #cocina { max-width:100vw; }
       #pastel { width:110px; height:110px; }
       #personaje { width:80px; height:65px; }
       #notaPedido { font-size:1em; min-width: 90px; max-width: 190px; }
       #horno { width:80px; height:60px; }
+      #botonMute { 
+        bottom: 10px; 
+        right: 10px; 
+        width: 40px; 
+        height: 40px; 
+        font-size: 1.2em; 
+      }
     }
   </style>
 </head>
@@ -70,6 +91,7 @@
     <div id="calificacion"></div>
     <div id="mensaje"></div>
     <div id="puntaje"></div>
+    <button id="botonMute">🔊</button>
   </div>
   <script>
     // --- Temáticas y personajes por nivel ---
@@ -135,11 +157,13 @@
     const sonidoEscribir = document.getElementById('sonido-escribir');
     const sonidoEntregar = document.getElementById('sonido-entregar');
     const sonidoUndertale = document.getElementById('sonido-undertale');
+    const botonMute = document.getElementById('botonMute');
     musica.volume = 0.4;  // Volumen más bajo para la música de fondo
     sonidoEscribir.volume = 1.0;
     sonidoEntregar.volume = 1.0;
     sonidoUndertale.volume = 1.0;
     let musicaIniciada = false;
+    let musicaMuteada = false;
     function iniciarSonidos() {
       if(!musicaIniciada){
         musica.play().catch(e => {
@@ -159,6 +183,18 @@
     });
     document.body.addEventListener('pointerdown', iniciarSonidos, {once:true});
     document.body.addEventListener('keydown', iniciarSonidos, {once:true});
+
+    // --- Función de mute/unmute ---
+    botonMute.onclick = () => {
+      musicaMuteada = !musicaMuteada;
+      if(musicaMuteada) {
+        musica.muted = true;
+        botonMute.textContent = "🔇";
+      } else {
+        musica.muted = false;
+        botonMute.textContent = "🔊";
+      }
+    };
 
     // --- Opciones de pasteles ---
     const bases = [
