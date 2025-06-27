@@ -729,9 +729,24 @@
     function escribirNotaPedido(texto) {
       notaPedidoDiv.innerHTML = "";
       let i = 0;
+      let enTag = false;
+      let tagBuffer = "";
+      
       function escribir() {
         if(i < texto.length) {
-          notaPedidoDiv.innerHTML += texto[i];
+          if(texto[i] === '<') {
+            enTag = true;
+            tagBuffer = '<';
+          } else if(enTag && texto[i] === '>') {
+            tagBuffer += '>';
+            notaPedidoDiv.innerHTML += tagBuffer;
+            tagBuffer = "";
+            enTag = false;
+          } else if(enTag) {
+            tagBuffer += texto[i];
+          } else {
+            notaPedidoDiv.innerHTML += texto[i];
+          }
           // Deshabilitado temporalmente hasta tener archivos de sonido locales
           // sonidoEscribir.currentTime = 0;
           // sonidoEscribir.play().catch(e => {
@@ -783,7 +798,7 @@
       };
       escribirCharla(`${pedido.personaje.nombre}: ${pedido.personaje.charla}`);
       escribirNotaPedido(
-        `Pedido:\n- Base: ${bases[pedido.base].nombre}\n- Crema: ${cremas[pedido.crema].nombre}\n- Decoración: ${decoraciones[pedido.deco].nombre}\n- Extra: ${extras[pedido.extra].nombre}`
+        `Pedido:<br>- Base: ${bases[pedido.base].nombre}<br>- Crema: ${cremas[pedido.crema].nombre}<br>- Decoración: ${decoraciones[pedido.deco].nombre}<br>- Extra: ${extras[pedido.extra].nombre}`
       );
       animX = -110;
       animIn = true;
