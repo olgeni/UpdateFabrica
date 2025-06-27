@@ -73,7 +73,8 @@
 <body>
   <!-- Música y sonidos personalizados -->
   <audio id="musica" src="sound/fabrica-de-pasteles-01.ogg" preload="auto"></audio>
-  <audio id="sonido-escribir" preload="auto"></audio>
+  <audio id="sonido-escribir" src="sound/key.ogg" preload="auto"></audio>
+  <audio id="sonido-espacio" src="sound/space.ogg" preload="auto"></audio>
   <audio id="sonido-entregar" preload="auto"></audio>
   <audio id="sonido-undertale" preload="auto"></audio>
   <div id="juego">
@@ -155,11 +156,13 @@
     ];
     let indicePistaActual = 0;
     const sonidoEscribir = document.getElementById('sonido-escribir');
+    const sonidoEspacio = document.getElementById('sonido-espacio');
     const sonidoEntregar = document.getElementById('sonido-entregar');
     const sonidoUndertale = document.getElementById('sonido-undertale');
     const botonMute = document.getElementById('botonMute');
     musica.volume = 0.4;  // Volumen más bajo para la música de fondo
-    sonidoEscribir.volume = 1.0;
+    sonidoEscribir.volume = 0.7;  // Volumen moderado para el efecto de tecla
+    sonidoEspacio.volume = 0.7;  // Volumen moderado para el efecto de espacio
     sonidoEntregar.volume = 1.0;
     sonidoUndertale.volume = 1.0;
     let musicaIniciada = false;
@@ -786,14 +789,23 @@
           } else {
             // Carácter normal - agregar con efecto de máquina de escribir
             notaPedidoDiv.innerHTML += texto[i];
+            // Reproducir sonido de tecla o espacio
+            if(!enTag && !musicaMuteada) {
+              if(texto[i] === ' ') {
+                sonidoEspacio.currentTime = 0;
+                sonidoEspacio.play().catch(e => {
+                  // Ignorar errores de audio silenciosamente
+                });
+              } else if(texto[i] !== '\n') {
+                sonidoEscribir.currentTime = 0;
+                sonidoEscribir.play().catch(e => {
+                  // Ignorar errores de audio silenciosamente
+                });
+              }
+            }
           }
-          // Deshabilitado temporalmente hasta tener archivos de sonido locales
-          // sonidoEscribir.currentTime = 0;
-          // sonidoEscribir.play().catch(e => {
-          //   // Silently ignore audio errors
-          // });
           i++;
-          setTimeout(escribir, 30 + Math.random()*40);
+          setTimeout(escribir, 80 + Math.random()*60);
         }
       }
       escribir();
