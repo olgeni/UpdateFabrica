@@ -729,22 +729,26 @@
     function escribirNotaPedido(texto) {
       notaPedidoDiv.innerHTML = "";
       let i = 0;
-      let enTag = false;
-      let tagBuffer = "";
+      let enTag = false; // Rastrea si estamos dentro de una etiqueta HTML
+      let tagBuffer = ""; // Almacena la etiqueta HTML completa
       
       function escribir() {
         if(i < texto.length) {
           if(texto[i] === '<') {
+            // Inicio de etiqueta HTML detectado
             enTag = true;
             tagBuffer = '<';
           } else if(enTag && texto[i] === '>') {
+            // Fin de etiqueta HTML - agregar la etiqueta completa de una vez
             tagBuffer += '>';
             notaPedidoDiv.innerHTML += tagBuffer;
             tagBuffer = "";
             enTag = false;
           } else if(enTag) {
+            // Construir la etiqueta HTML carácter por carácter
             tagBuffer += texto[i];
           } else {
+            // Carácter normal - agregar con efecto de máquina de escribir
             notaPedidoDiv.innerHTML += texto[i];
           }
           // Deshabilitado temporalmente hasta tener archivos de sonido locales
